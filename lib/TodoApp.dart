@@ -1,5 +1,11 @@
+import "dart:ui";
+
 import "package:flutter/material.dart";
+import "package:flutter/rendering.dart";
+import "package:flutter/widgets.dart";
 import "package:google_fonts/google_fonts.dart";
+import "package:intl/intl.dart";
+import "package:flutter_slidable/flutter_slidable.dart";
 
 class TodoApp extends StatefulWidget {
   const TodoApp({super.key});
@@ -8,75 +14,477 @@ class TodoApp extends StatefulWidget {
   State createState() => _TodoAppState();
 }
 
+class ModelClass {
+  String title;
+  String description;
+  String date;
+  ModelClass(
+      {required this.title, required this.description, required this.date});
+}
+
 class _TodoAppState extends State {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Color.fromRGBO(111, 81, 255, 1),
-      body: Container(
-        padding: EdgeInsets.only(right: 0),
-        child: Column(
-          children: [
-            const SizedBox(
-              height: 25,
+  final TextEditingController dateController = TextEditingController();
+
+  final TextEditingController titleController = TextEditingController();
+
+  final TextEditingController descriptionController = TextEditingController();
+
+  final _formKey = GlobalKey<FormState>();
+
+  Future<void> showBottomSheet(bool doEdit, [ModelClass? obj]) async {
+    await showModalBottomSheet(
+        isScrollControlled: true,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(30),
+          ),
+        ),
+        context: context,
+        builder: (context) {
+          return Padding(
+            padding: EdgeInsets.only(
+              left: 15,
+              right: 15,
+              bottom: MediaQuery.of(context).viewInsets.bottom,
             ),
-            Text(
-              "Good Morning",
-              style: GoogleFonts.quicksand(
-                fontWeight: FontWeight.w400,
-                fontSize: 22,
-                color: Color.fromRGBO(255, 255, 255, 1),
-              ),
-            ),
-            Text(
-              "Abhay Patil",
-              style: GoogleFonts.quicksand(
-                fontWeight: FontWeight.w600,
-                fontSize: 30,
-                color: const Color.fromRGBO(255, 255, 255, 1),
-              ),
-            ),
-            Column(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  height: 621,
-                  width: 360,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.rectangle,
-                    border: Border(
-                        //  top:BorderRadius.circular(10),
-                        ),
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30),
-                    ),
-                    color: const Color.fromRGBO(217, 217, 217, 1),
+                const SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  "Create Task",
+                  style: GoogleFonts.quicksand(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 22,
                   ),
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                Form(
+                  key: _formKey,
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Create TO DO LIST",
+                        "Title",
                         style: GoogleFonts.quicksand(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          height: 3,
+                          color: const Color.fromRGBO(89, 57, 241, 1),
+                          fontWeight: FontWeight.w400,
+                          fontSize: 15,
                         ),
+                      ),
+                      const SizedBox(
+                        height: 3,
+                      ),
+                      //TitleController
+                      TextFormField(
+                        controller: titleController,
+                        decoration: InputDecoration(
+                          hintText: "Enter Title",
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color.fromRGBO(89, 57, 241, 1),
+                            ),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Colors.red,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onTap: () {
+                          obj!.title = titleController.text;
+                        },
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      Text(
+                        "Description",
+                        style: GoogleFonts.quicksand(
+                          color: const Color.fromRGBO(89, 57, 241, 1),
+                          fontWeight: FontWeight.w400,
+                          fontSize: 15,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 3,
+                      ),
+                      //Description Controller
+                      TextFormField(
+                        controller: descriptionController,
+                        decoration: InputDecoration(
+                          hintText: "Enter Description",
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color.fromRGBO(89, 57, 241, 1),
+                            ),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Colors.red,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onTap: () {
+                          obj!.description = descriptionController.text;
+                        },
+                      ),
+
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      Text(
+                        "Date",
+                        style: GoogleFonts.quicksand(
+                          color: const Color.fromRGBO(89, 57, 241, 1),
+                          fontWeight: FontWeight.w400,
+                          fontSize: 15,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 3,
+                      ),
+                      //DateController
+                      TextFormField(
+                        controller: dateController,
+                        decoration: InputDecoration(
+                          hintText: "Enter Date",
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color.fromRGBO(89, 57, 241, 1),
+                            ),
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Colors.red,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onTap: () async {
+                          DateTime? pickDate = await showDatePicker(
+                            context: context,
+                            initialDate: DateTime.now(),
+                            firstDate: DateTime(2),
+                            lastDate: DateTime(2024),
+                          );
+                          String formatDate =
+                              DateFormat.yMMMd().format(pickDate!);
+                          dateController.text = formatDate;
+                        },
+                        readOnly: true,
+                      ),
+                      const SizedBox(
+                        height: 15,
                       ),
                     ],
                   ),
                 ),
-                // ListView.builder(
-                //   itemCount: 5,
-                //   itemBuilder: (BuildContext context, int index) {
-                //     return Column(
-                //       children: [],
-                //     );
-                //   },
-                // ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  height: 50,
+                  width: 300,
+                  margin: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(13),
+                      ),
+                      backgroundColor: const Color.fromRGBO(89, 57, 241, 1),
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: Text(
+                      "Submit",
+                      style: GoogleFonts.inter(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
-            Column(),
+          );
+        });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: const Color.fromRGBO(111, 81, 255, 1),
+      body: Padding(
+        padding: const EdgeInsets.only(
+          top: 100,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.only(
+                left: 35,
+              ),
+              child: Text(
+                "Goog Morning",
+                style: GoogleFonts.quicksand(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 30,
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            Expanded(
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Color.fromRGBO(217, 217, 217, 1),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(40),
+                    topRight: Radius.circular(40),
+                  ),
+                ),
+                width: double.infinity,
+                child: Column(
+                  children: [
+                    const SizedBox(
+                      height: 30,
+                    ),
+                    Text(
+                      "Create Tasks",
+                      style: GoogleFonts.quicksand(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 15,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 10,
+                    ),
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.only(
+                          top: 20,
+                        ),
+                        decoration: const BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(40),
+                            topRight: Radius.circular(40),
+                          ),
+                        ),
+                        child: ListView.builder(
+                          itemCount: 10,
+                          itemBuilder: (context, index) {
+                            return Slidable(
+                              closeOnScroll: true,
+                              endActionPane: ActionPane(
+                                extentRatio: 0.2,
+                                motion: const DrawerMotion(),
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceAround,
+                                      children: [
+                                        const SizedBox(
+                                          height: 5,
+                                        ),
+                                        GestureDetector(
+                                          child: Container(
+                                            padding: const EdgeInsets.all(10),
+                                            height: 40,
+                                            width: 40,
+                                            decoration: BoxDecoration(
+                                              color: const Color.fromRGBO(
+                                                  89, 57, 241, 1),
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
+                                            child: const Icon(
+                                              Icons.edit,
+                                              color: Colors.white,
+                                              size: 20,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 20,
+                                        ),
+                                        GestureDetector(
+                                          child: Container(
+                                            padding: const EdgeInsets.all(5),
+                                            height: 40,
+                                            width: 40,
+                                            decoration: BoxDecoration(
+                                              color: const Color.fromRGBO(
+                                                  89, 57, 241, 1),
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                            ),
+                                            child: const Icon(
+                                              Icons.delete,
+                                              color: Colors.white,
+                                              size: 20,
+                                            ),
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          height: 5,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              key: ValueKey(index),
+                              child: Container(
+                                margin: const EdgeInsets.only(top: 10),
+                                padding: const EdgeInsets.only(
+                                    left: 20, bottom: 20, top: 20),
+                                decoration: BoxDecoration(
+                                  color: const Color.fromRGBO(250, 255, 255, 1),
+                                  border: Border.all(
+                                    color: const Color.fromRGBO(0, 0, 0, 0.13),
+                                    width: 0.5,
+                                  ),
+                                  boxShadow: const [
+                                    BoxShadow(
+                                      offset: Offset(0, 4),
+                                      blurRadius: 20,
+                                      color: Color.fromRGBO(0, 0, 0, 0.13),
+                                    ),
+                                  ],
+                                  borderRadius:
+                                      const BorderRadius.all(Radius.zero),
+                                ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          height: 60,
+                                          width: 60,
+                                          decoration: const BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: Color.fromRGBO(
+                                                217, 217, 217, 1),
+                                          ),
+                                          child: Image.asset(
+                                            "asset/Image/dummy.jpg",
+                                          ),
+                                        ),
+                                        const SizedBox(
+                                          width: 20,
+                                        ),
+                                        SizedBox(
+                                          width: 260,
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "Lorem Ipsum is Simply dummy industry",
+                                                style: GoogleFonts.quicksand(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.black,
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                height: 5,
+                                              ),
+                                              Text(
+                                                "Simply dummy text of the printing and  has been the typesetting Lorem Ipsum has been the industry.",
+                                                style: GoogleFonts.inter(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: const Color.fromRGBO(
+                                                      0, 0, 0, 0.7),
+                                                ),
+                                              ),
+                                              const SizedBox(
+                                                height: 5,
+                                              ),
+                                              Text(
+                                                "10 July 2023",
+                                                style: GoogleFonts.inter(
+                                                  color: const Color.fromRGBO(
+                                                      0, 0, 0, 0.7),
+                                                  fontWeight: FontWeight.w400,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        Checkbox(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                          activeColor: Colors.green,
+                                          value: true,
+                                          onChanged: (val) {},
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color.fromRGBO(89, 57, 241, 1),
+        onPressed: () async {
+          await showBottomSheet(false);
+        },
+        child: const Icon(
+          Icons.add,
+          size: 50,
+          color: Colors.white,
         ),
       ),
     );
